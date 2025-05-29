@@ -125,7 +125,28 @@ class Decode : public EncodeDecodeBase{
         }
         return tokens;
     }
-
+public:
+	std::string decodeString(const std::string& input) {
+   	 std::string result;
+    		for (size_t i = 0; i < input.length(); ++i) {
+       		 if (input[i] == '%' && i + 2 < input.length()) {
+            std::istringstream iss(input.substr(i + 1, 2));
+            int hexValue;
+            if (iss >> std::hex >> hexValue) {
+                result += static_cast<char>(hexValue);
+                i += 2;
+            } else {
+                result += '%'; // malformed sequence, keep it as-is
+            }
+        } else if (input[i] == '+') {
+            result += ' '; // Optional: convert '+' to space
+        } else {
+            result += input[i];
+        }
+    }
+    return result;
+	}
+private:
     void buildParameters(const std::string &iParameters){
         auto keyValTokens = split(iParameters, '&');
         for(auto keyValToken : keyValTokens){
